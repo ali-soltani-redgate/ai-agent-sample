@@ -2,7 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain.tools import tool
 from langchain_classic.agents import initialize_agent, AgentType
 from langchain_classic.chains import LLMChain
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 import re
 
 # Set up local Ollama model
@@ -13,11 +13,19 @@ llm = ChatOllama(
 )
 
 
-# ----- Weather chain wrapped as a tool -----
-weather_prompt = PromptTemplate.from_template(
-    "You are a weather assistant. Answer very briefly.\n\nCity: {city}\nWeather:"
+# Define a prompt template for the weather tool
+weather_prompt = ChatPromptTemplate.from_messages(
+    [
+        SystemMessagePromptTemplate.from_template(
+            "You are a weather assistant. Answer very briefly."
+        ),
+        HumanMessagePromptTemplate.from_template(
+            "City: {city}\nWeather:"
+        ),
+    ]
 )
 
+# ----- Weather chain wrapped as a tool -----
 weather_chain = LLMChain(llm=llm, prompt=weather_prompt)
 
 
